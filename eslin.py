@@ -31,36 +31,37 @@ else:
         return char.lower()
 
 def convertitore():
-    print("=== CONVERTITORE UNIVERSALE (Win/Lin) ===")
-    print("Premi [C] per Celsius, [F] per Fahrenheit o [ESC] per uscire.")
-    
     while True:
+        print("=== CONVERTITORE UNIVERSALE (Win/Lin) ===")
+        print("Premi [C] per Celsius, [F] per Fahrenheit o [ESC] per uscire.")
         scelta = get_key()
-        
-        if scelta == "ESC":
-            print("\nUscita in corso... a presto!")
-            break
-            
-        if scelta == 'c':
-            try:
-                c = float(input("\nInserisci temperatura in °C: "))
-                f = (c * 9/5) + 32
-                res = int(f) if f.is_integer() else round(f, 2)
-                print(f"Risultato: {res}°F 🌡\n")
-            except ValueError:
-                print("Errore: Inserisci un numero valido.")
-                
-        elif scelta == 'f':
-            try:
-                f = float(input("\nInserisci temperatura in °F: "))
-                c = (f - 32) * 5/9
-                res = int(c) if c.is_integer() else round(c, 2)
-                print(f"Risultato: {res}°C 🌡\n")
-            except ValueError:
-                print("Errore: Inserisci un numero valido.")
-        
-        if scelta in ['c', 'f']:
-            print("Premi un tasto per continuare [C/F] o ESC per uscire...")
-
+        match scelta:
+            case "c":
+                try:
+                    c = float(input("\nInserisci temperatura in °C: "))
+                    f = (c * 9/5) + 32
+                    res = int(f) if f.is_integer() else round(f, 2)
+                    print(f"Risultato: {res}°F 🌡\n")
+                except ValueError:
+                    print("Errore: Inserisci un numero valido.")
+            case "f":
+                try:
+                    f = float(input("\nInserisci temperatura in °F: "))
+                    c = (f - 32) * 5/9
+                    res = int(c) if c.is_integer() else round(c, 2)
+                    print(f"Risultato: {res}°C 🌡\n")
+                except ValueError:
+                    print("Errore: Inserisci un numero valido.")
+            case "ESC":
+                print("\nUscita in corso... a presto!")
+                break
+            case _:
+                 try:
+                    c = float(input("\nInserisci temperatura in °C: "))
+                    f = (c * 9/5) + 32
+                    res = int(f) if f.is_integer() else round(f, 2)
+                    print(f"Risultato: {res}°F 🌡\n")
+                 except ValueError:
+                    print("Errore: Inserisci un numero valido.")
 if __name__ == "__main__":
     convertitore()
