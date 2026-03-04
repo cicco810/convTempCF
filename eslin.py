@@ -1,54 +1,66 @@
 import sys
-import tty
-import termios
+import platform
 
-def getch():
-    """Legge un singolo tasto su Linux senza aspettare l'Invio."""
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    return ch
+# Gestione delle importazioni in base al Sistema Operativo
+if platform.system() == "Windows":
+    import msvcrt
+    def get_key():
+        # Legge un tasto su Windows
+        char = msvcrt.getch()
+        if char == b'\x1b':  # ESC su Windows spesso restituisce 27
+            return "ESC"
+        try:
+            return char.decode('utf-8').lower()
+        except:
+            return None
+else:
+    import tty
+    import termios
+    def get_key():
+        # Legge un tasto su Linux/macOS
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            char = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        
+        if ord(char) == 27: # Codice ASCII per ESC
+            return "ESC"
+        return char.lower()
 
 def convertitore():
-    print("=== CONVERTITORE LINUX ===")
-    print("Premi ESC per uscire, C per Celsius, F per Fahrenheit")
-
-    while True:
-        # Cattura il tasto
-        tasto = getch()
-
-        # Gestione con MATCH
-        match tasto:
-            case '\x1b': # Tasto ESC
-                print("\nUscita... a presto!")
-                break
-            
-            case 'c' | 'C':
-                try:
-                    celsius = float(input("\nInserisci °C: "))
-                    fahrenheit = (celsius * 9/5) + 32
-                    print(f"Risultato: {fahrenheit:g} °F 🌡")
-                except ValueError:
-                    print("Errore: inserisci un numero valido!")
-
-            case 'f' | 'F':
-                try:
-                    fahrenheit = float(input("\nInserisci °F: "))
-                    celsius = (fahrenheit - 32) * 5/9
-                    print(f"Risultato: {celsius:g} °C 🌡")
-                except ValueError:
-                    print("Errore: inserisci un numero valido!")
-            
-            case _: # Qualsiasi altro tasto
-                try:
-                    celsius = float(input("\nInserisci °C: "))
-                    fahrenheit = (celsius * 9/5) + 32
-                    print(f"Risultato: {fahrenheit:g} °F 🌡")
-                except ValueError:
-                    print("Errore: inserisci un numero valido!")
+    print("=== CONVERTITORE UNIVERSALE (Win/Lin) ===")
+    print("Premi [C] per Celsius, [F] per Fahrenheit o [ESC] per uscire.")
     
-convertitore_linux()
+    while True:
+        scelta = get_key()
+        
+        if scelta == "ESC":
+            print("\nUscita in corso... a presto!")
+            break
+            
+        if scelta == 'c':
+            try:
+                c = float(input("\nInserisci temperatura in °C: "))
+                f = (c * 9/5) + 32
+                res = int(f) if f.is_integer() else round(f, 2)
+                print(f"Risultato: {res}°F 🌡\n")
+            except ValueError:
+                print("Errore: Inserisci un numero valido.")
+                
+        elif scelta == 'f':
+            try:
+                f = float(input("\nInserisci temperatura in °F: "))
+                c = (f - 32) * 5/9
+                res = int(c) if c.is_integer() else round(c, 2)
+                print(f"Risultato: {res}°C 🌡\n")
+            except ValueError:
+                print("Errore: Inserisci un numero valido.")
+        
+        if scelta in ['c', 'f']:
+            print("Premi un tasto per continuare [C/F] o ESC per uscire...")
+
+if __name__ == "__main__":
+    convertitore()
